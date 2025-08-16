@@ -13,9 +13,11 @@ namespace Components {
 // ----------------------------------------------------------------------
 void ADCS ::Components_ADCS_StateMachine_action_checkModeStatus(SmId smId,
                                                                 Components_ADCS_StateMachine::Signal signal) {
-    // Get mode status
-    ModeStatus modeStatus = this->getModeStatus_out(m_modeInUse);
-    switch (modeStatus) {
+    // Exit if sub-process status not connected
+    if (!this->isConnected_getSubProcessStatus_OutputPort(m_activeMode)) {
+        return;
+    }
+    switch (m_subProcessStatus) {
         case ModeStatus::SUCCESS:
             this->stateMachine_sendSignal_success();
             break;
@@ -33,26 +35,26 @@ void ADCS ::Components_ADCS_StateMachine_action_checkModeStatus(SmId smId,
 
 void ADCS ::Components_ADCS_StateMachine_action_useReserveMode(SmId smId,
                                                                 Components_ADCS_StateMachine::Signal signal) {
-    // Set port connection 
-    m_modeInUse = m_reserveMode;
+    // Set reserve as active mode
+    setActiveMode(m_availableModes.get_reserve());
 }
 
 void ADCS ::Components_ADCS_StateMachine_action_usePrimaryMode(SmId smId,
                                                                 Components_ADCS_StateMachine::Signal signal) {
-    // Set port connection 
-    m_modeInUse = m_primaryMode;
+    // Set primary as active mode
+    setActiveMode(m_availableModes.get_primary());
 }
 
 void ADCS ::Components_ADCS_StateMachine_action_useSuccessMode(SmId smId,
                                                                 Components_ADCS_StateMachine::Signal signal) {
-    // Set port connection 
-    m_modeInUse = m_successMode;
+    // Set success as active mode
+    setActiveMode(m_availableModes.get_success());
 }
 
 void ADCS ::Components_ADCS_StateMachine_action_useFailureMode(SmId smId,
                                                                 Components_ADCS_StateMachine::Signal signal) {
-    // Set port connection 
-    m_modeInUse = m_failureMode;
+    // Set failure as active mode
+    setActiveMode(m_availableModes.get_failure());
 }
 
 }  // namespace Components

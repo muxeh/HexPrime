@@ -42,11 +42,10 @@ telemetry packets HexRefPackets {
   }
 
   packet ADCS id 3 group 1 {
-    adcs.reserve_mode
-    adcs.primary_mode
-    adcs.success_mode
-    adcs.failure_mode
-    adcs.mode_in_use
+    adcs.available_modes
+    adcs.active_mode
+    adcs.$state
+    adcs.subprocess_status
   }
 
   packet SystemRes1 id 5 group 2 {

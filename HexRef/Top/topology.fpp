@@ -120,7 +120,26 @@ module HexRef {
       rateGroup3.RateGroupMemberOut[2] -> DataProducts.dpBufferManager.schedIn
       rateGroup3.RateGroupMemberOut[3] -> DataProducts.dpWriter.schedIn
       rateGroup3.RateGroupMemberOut[4] -> DataProducts.dpMgr.schedIn
-      rateGroup3.RateGroupMemberOut[5] -> adcs.run
+      rateGroup3.RateGroupMemberOut[5] -> adcs.executeStateMachine
+    }
+
+    connections adcs {
+        # Get subprocess status
+        adcs.getSubProcessStatus [Components.ADCSMode.STANDBY] -> adcs.returnDummySubProcessStatus
+        adcs.getSubProcessStatus [Components.ADCSMode.DETUMBLE] -> adcs.returnDummySubProcessStatus
+        adcs.getSubProcessStatus [Components.ADCSMode.SUN_ACQ] -> adcs.returnDummySubProcessStatus
+        adcs.getSubProcessStatus [Components.ADCSMode.TRACK_Sun] -> adcs.returnDummySubProcessStatus
+        adcs.getSubProcessStatus [Components.ADCSMode.TRACK_RSO] -> adcs.returnDummySubProcessStatus
+        adcs.getSubProcessStatus [Components.ADCSMode.SLEW_ACS] -> adcs.returnDummySubProcessStatus
+        adcs.getSubProcessStatus [Components.ADCSMode.SLEW_RW] -> adcs.returnDummySubProcessStatus
+        # Reset subprocess
+        adcs.resetSubProcess [Components.ADCSMode.STANDBY] -> adcs.resetDummySubProcess
+        adcs.resetSubProcess [Components.ADCSMode.DETUMBLE] -> adcs.resetDummySubProcess
+        adcs.resetSubProcess [Components.ADCSMode.SUN_ACQ] -> adcs.resetDummySubProcess
+        adcs.resetSubProcess [Components.ADCSMode.TRACK_Sun] -> adcs.resetDummySubProcess
+        adcs.resetSubProcess [Components.ADCSMode.TRACK_RSO] -> adcs.resetDummySubProcess
+        adcs.resetSubProcess [Components.ADCSMode.SLEW_ACS] -> adcs.resetDummySubProcess
+        adcs.resetSubProcess [Components.ADCSMode.SLEW_RW] -> adcs.resetDummySubProcess
     }
 
     connections CdhCore_cmdSeq {

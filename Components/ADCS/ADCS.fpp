@@ -7,7 +7,15 @@ module Components {
         TRACK_Sun = 3,
         TRACK_RSO = 4,
         SLEW_ACS = 5,
-        SLEW_RW = 6
+        SLEW_RW = 6,
+        NUM_ADCS_MODES = 7
+    }
+
+    struct ADCSModeSet {
+        reserve: ADCSMode,
+        primary: ADCSMode,
+        success: ADCSMode,
+        failure: ADCSMode
     }
 
     enum ADCSModeStatus {
@@ -18,6 +26,8 @@ module Components {
 
     port ModeStatusGetter() -> ADCSModeStatus
 
+    port Invocator()
+
     @ Component for F Prime FSW framework.
     active component ADCS {
 
@@ -27,20 +37,41 @@ module Components {
         state machine instance stateMachine: StateMachine
         
         # Telemetry
-        telemetry reserve_mode: Components.ADCSMode
-        telemetry primary_mode: Components.ADCSMode
-        telemetry success_mode: Components.ADCSMode
-        telemetry failure_mode: Components.ADCSMode
-        telemetry mode_in_use: Components.ADCSMode
+        telemetry available_modes: ADCSModeSet
+        telemetry active_mode: ADCSMode
+        telemetry $state: I32
+        telemetry subprocess_status: ADCSModeStatus
+
+        # Events
+        event REQUESTED_ACTIVE_MODE_MATCHES_CURRENT(mode: ADCSMode) \
+            severity activity low \
+            format "Requested mode ({}) matches current active mode--proceeding without reset."
+
+        event MODE_TRANSITION(currentMode: ADCSMode, newMode: ADCSMode) \
+            severity activity high \
+            format "Active mode transitioning from ({}) to ({}). Resetting both state machines."
+
         
         # Ports
         @ Getting status from sub-processes
-        output port getModeStatus: Components.ModeStatusGetter
+        output port getSubProcessStatus: [ADCSMode.NUM_ADCS_MODES] Components.ModeStatusGetter
         @ Receiving calls from rate group
-        sync input port run: Svc.Sched
+        sync input port executeStateMachine: [ADCSMode.NUM_ADCS_MODES] Svc.Sched
+        @ Ticking subprocesses
+        output port tickSubProcess: [ADCSMode.NUM_ADCS_MODES] Components.Invocator
+        @ Resetting subprocesses
+        output port resetSubProcess: [ADCSMode.NUM_ADCS_MODES] Components.Invocator
+
+        # Dummy state machine
+        sync input port returnDummySubProcessStatus: Components.ModeStatusGetter
+        sync input port resetDummySubProcess: Invocator
         
-        @ TODO
-        async command TODO opcode 0
+        @ Command to start new mode
+        async command startNewMode(primaryMode: ADCSMode,
+                                   successMode: ADCSMode,
+                                   failureMode: ADCSMode) opcode 0
+
+        async command setDummySubProcessStatus(status: ADCSModeStatus)
 
         ##############################################################################
         #### Uncomment the following examples to start customizing your component ####

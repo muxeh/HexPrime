@@ -38,33 +38,48 @@ class ADCS final : public ADCSComponentBase {
     // Handler implementations for typed input ports
     // ----------------------------------------------------------------------
 
-    //! Handler implementation for run
+    //! Handler implementation for executeStateMachine
     //!
     //! Receiving calls from rate group
-    void run_handler(FwIndexType portNum,  //!< The port number
-                     U32 context           //!< The call order
-                     ) override;
+    void executeStateMachine_handler(FwIndexType portNum,  //!< The port number
+                                     U32 context           //!< The call order
+                                     ) override;
+
+    //! Handler implementation for returnDummySubProcessStatus
+    Components::ADCSModeStatus returnDummySubProcessStatus_handler(FwIndexType portNum  //!< The port number
+                                                                   ) override;
 
   private:
     // ----------------------------------------------------------------------
     // Private members
     // ----------------------------------------------------------------------
-    Components::ADCSMode m_reserveMode;
-    Components::ADCSMode m_primaryMode;
-    Components::ADCSMode m_successMode;
-    Components::ADCSMode m_failureMode;
-    Components::ADCSMode m_modeInUse;
-
+    // Mode declarations 
+    Components::ADCSModeSet m_availableModes;
+    Components::ADCSMode m_activeMode;
+    // Mode status
+    Components::ADCSModeStatus m_subProcessStatus;
+    Components::ADCSModeStatus m_dummySubProcessStatus;
     // ----------------------------------------------------------------------
     // Handler implementations for commands
     // ----------------------------------------------------------------------
 
-    //! Handler implementation for command TODO
+    //! Handler implementation for command startNewMode
     //!
-    //! TODO
-    void TODO_cmdHandler(FwOpcodeType opCode,  //!< The opcode
-                         U32 cmdSeq            //!< The command sequence number
-                         ) override;
+    //! Command to start new mode
+    void startNewMode_cmdHandler(FwOpcodeType opCode,  //!< The opcode
+                                 U32 cmdSeq,           //!< The command sequence number
+                                 Components::ADCSMode primaryMode,
+                                 Components::ADCSMode successMode,
+                                 Components::ADCSMode failureMode) override;
+
+    //! Handler implementation for command setDummySubProcessStatus
+    void setDummySubProcessStatus_cmdHandler(FwOpcodeType opCode,  //!< The opcode
+                                             U32 cmdSeq,           //!< The command sequence number
+                                             Components::ADCSModeStatus status) override;
+
+    //! Handler implementation for resetDummySubProcess
+    void resetDummySubProcess_handler(FwIndexType portNum  //!< The port number
+                                      ) override;
 
   private:
     // ----------------------------------------------------------------------
@@ -107,6 +122,7 @@ class ADCS final : public ADCSComponentBase {
     void startNewMode(Components::ADCSMode primaryMode,
                       Components::ADCSMode successMode,
                       Components::ADCSMode failureMode);
+    void setActiveMode(Components::ADCSMode newActiveMode);
 };
 
 }  // namespace Components
