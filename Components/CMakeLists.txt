@@ -3,3 +3,4 @@
 # add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/MyComponent")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/VNSFilter/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/ADCS/")
+add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/DescentGuidance/")

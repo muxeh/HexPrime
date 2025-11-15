@@ -17,6 +17,8 @@
 register_fprime_library(
     AUTOCODER_INPUTS
         "${CMAKE_CURRENT_LIST_DIR}/DescentGuidance.fpp"
+        "${CMAKE_CURRENT_LIST_DIR}/DescentGuidanceCommands.fppi"
+        "${CMAKE_CURRENT_LIST_DIR}/StateMachine.fppi"
     SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/DescentGuidance.cpp"
 #   DEPENDS
