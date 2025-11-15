@@ -62,7 +62,9 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_igniteMain
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_dsouzaGuidance(
     SmId smId,
     components_DescentGuidance_StateMachine::Signal signal) {
-    // TODO
+    // Set update inputs
+    // Execute DsouzaGuidance
+    // Extract ouputs, assign guidance commmand
 }
 
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_shutdownMainEngine(
@@ -112,5 +114,4 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_shutdownAl
     components_DescentGuidance_StateMachine::Signal signal) {
     // TODO
 }
-
 }  // namespace components

@@ -1,6 +1,6 @@
 // ======================================================================
 // \title  DescentGuidance.hpp
-// \author maxbinaei
+// \author maxwell.binaei
 // \brief  hpp file for DescentGuidance component implementation class
 // ======================================================================
 
@@ -117,6 +117,10 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
         SmId smId,                                              //!< The state machine id
         components_DescentGuidance_StateMachine::Signal signal  //!< The signal
         ) override;
+
+    // ----------------------------------------------------------------------
+    // Helper Functions
+    // ----------------------------------------------------------------------
 };
 
 }  // namespace components
