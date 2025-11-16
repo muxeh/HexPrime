@@ -5,7 +5,7 @@ state machine StateMachine {
     
     # Signals
     signal atInTrackPDI
-    signal horizontalVelocityAchieved
+    signal horizVelAchieved
     signal velDirChangeThreshExceeded
     signal minVNSAGLReached
     signal atLandingAGL
@@ -54,7 +54,7 @@ state machine StateMachine {
         
         on velDirChangeThreshExceeded enter TERMINAL
         
-        on horizontalVelocityAchieved enter TERMINAL
+        on horizVelAchieved enter TERMINAL
 
     }
     

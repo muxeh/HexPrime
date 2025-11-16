@@ -36,6 +36,7 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     types::vector3 m_guidAccelCmdMag;
     types::vector3 m_posGuid;
     types::vector3 m_velGuid;
+    F64 m_horizVelMag;
 
     // ----------------------------------------------------------------------
     // Handler implementations for typed input ports
