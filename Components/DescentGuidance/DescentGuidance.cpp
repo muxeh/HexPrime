@@ -16,13 +16,28 @@ DescentGuidance ::DescentGuidance(const char* const compName) : DescentGuidanceC
                                                                 m_guidErrPos(types::vector3(0)),
                                                                 m_guidErrVel(types::vector3(0)),
                                                                 m_velDirAtDsouzaEntry(types::vector3(0)),
-                                                                m_guidAccelCmdDirCBI(types::vector3(0)),
-                                                                m_guidAccelCmdMag(types::vector3(0)),
+                                                                m_guidAccelCmdCBI(types::vector3(0)),
                                                                 m_posGuid(types::vector3(0)),
                                                                 m_velGuid(types::vector3(0)),
+                                                                m_dsouzaACMode(types::ACMode::NOT_SET),
+                                                                m_terminalACMode(types::ACMode::NOT_SET),
+                                                                m_landingACMode(types::ACMode::NOT_SET),
                                                                 m_horizVelMag(0) {}
 
 DescentGuidance ::~DescentGuidance() {}
+
+void DescentGuidance::configure(types::ACMode dsouzaACMode,
+                                types::ACMode terminalACMode,
+                                types::ACMode landingACMode) {
+    // Assert all modes are connected
+    FW_ASSERT(isConnected_setACMode_OutputPort(dsouzaACMode));
+    FW_ASSERT(isConnected_setACMode_OutputPort(landingACMode));
+    FW_ASSERT(isConnected_setACMode_OutputPort(terminalACMode));
+    // Assign AC modes for each phase
+    m_dsouzaACMode = dsouzaACMode;
+    m_terminalACMode = terminalACMode;
+    m_landingACMode = landingACMode;
+}
 
 // ----------------------------------------------------------------------
 // Handler implementations for typed input ports
@@ -56,7 +71,9 @@ void DescentGuidance ::stop_handler(FwIndexType portNum) {
 }
 
 types::vector3 DescentGuidance ::returnBodyAlignVec_handler(FwIndexType portNum) {
-    return types::vector3(0);
+    Fw::ParamValid vld(Fw::ParamValid::INVALID);
+    // Return body align vector parameter
+    return this->paramGet_BODY_ALIGN_VEC(vld);
 }
 
 types::vector3 DescentGuidance ::returnBodyConstrainVec_handler(FwIndexType portNum) {
@@ -78,7 +95,7 @@ types::vector3 DescentGuidance ::returnInertConstrainVec_handler(FwIndexType por
 }
 
 types::vector3 DescentGuidance ::returnInertAlignVec_handler(FwIndexType portNum) {
-    return types::vector3(0);
+    return vec3_normalized(m_guidAccelCmdCBI);
 }
 
 // ----------------------------------------------------------------------
@@ -96,7 +113,9 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_trackingGu
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_setDsouzaControllers(
     SmId smId,
     components_DescentGuidance_StateMachine::Signal signal) {
-    // TODO
+    Fw::ParamValid vld(Fw::ParamValid::INVALID);
+    // Set attitude control mode for DSouza
+    this->setACMode_out(m_dsouzaACMode);
 }
 
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_getVelDir(
@@ -157,7 +176,8 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_terminalAn
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_setTerminalControllers(
     SmId smId,
     components_DescentGuidance_StateMachine::Signal signal) {
-    // TODO
+    // Set attitude control mode for Terminal
+    this->setACMode_out(m_terminalACMode);
 }
 
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_buildDescentProfileTable(
@@ -175,7 +195,8 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_ignoreVNS(
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_setLandingControllers(
     SmId smId,
     components_DescentGuidance_StateMachine::Signal signal) {
-    // TODO
+    // Set attitude control mode for Terminal
+    this->setACMode_out(m_terminalACMode);
 }
 
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_ignoreRangeFinder(

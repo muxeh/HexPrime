@@ -14,6 +14,7 @@ telemetry guid_err_vel: types.vector3
 telemetry horiz_vel_mag: F64
 
 # Parameters
+telemetry BODY_ALIGN_VEC: types.vector3
 telemetry BODY_CONSTRAIN_VEC: types.vector3
 telemetry CONSTRAIN_VEC_OPTION: types.vector3
 telemetry DSOUZA_TARGET_BIAS: types.vector3

@@ -25,6 +25,11 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     //! Destroy DescentGuidance object
     ~DescentGuidance();
 
+    // Topology configure function
+    // Set AC mode of each phase
+    void configure(types::ACMode dsouzaACMode,
+                   types::ACMode terminalACMode,
+                   types::ACMode landingACMode);
   private:
     // ----------------------------------------------------------------------
     // Member variables
@@ -32,10 +37,12 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     types::vector3 m_guidErrPos;
     types::vector3 m_guidErrVel;
     types::vector3 m_velDirAtDsouzaEntry;
-    types::vector3 m_guidAccelCmdDirCBI;
-    types::vector3 m_guidAccelCmdMag;
+    types::vector3 m_guidAccelCmdCBI;
     types::vector3 m_posGuid;
     types::vector3 m_velGuid;
+    types::ACMode m_dsouzaACMode;
+    types::ACMode m_terminalACMode;
+    types::ACMode m_landingACMode;
     F64 m_horizVelMag;
 
     // ----------------------------------------------------------------------

@@ -1,4 +1,7 @@
-@ Body constrain vector
+@ Body align vector
+param BODY_ALIGN_VEC: types.vector3 default [1, 0, 0]
+
+@ Body constraint vector
 param BODY_CONSTRAIN_VEC: types.vector3 default [0, 1, 0]
 
 @ Inertial constrain vector option

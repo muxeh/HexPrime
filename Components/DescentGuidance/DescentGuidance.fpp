@@ -6,6 +6,12 @@ module components {
             scalar: F64
             vector: vector3
         }
+        enum ACMode {
+            AC_RCS_ONLY   = 0,
+            AC_RCS_FOR_ME = 1,
+            NUM_MODES     = 2,
+            NOT_SET       = 3
+        }
     }
 
     module ports {
@@ -13,6 +19,7 @@ module components {
         port F64Getter() -> F64
         port Vector3Getter() -> types.vector3
         port QuaternionGetter() -> types.quaternion
+        port ACModeSetter() -> types.ACMode
     }
 
     enum ConstrainVecOption {
@@ -39,6 +46,7 @@ module components {
         sync input port returnInertAlignVec: ports.Vector3Getter
         sync input port returnBodyConstrainVec: ports.Vector3Getter
         sync input port returnInertConstrainVec: ports.Vector3Getter
+        output port setACMode: ports.ACModeSetter
 
         @ Inertial constrain vector options
         output port getNorthVector: ports.Vector3Getter
@@ -54,6 +62,8 @@ module components {
         @ Get Guidance frame quaternions
         output port getQCBIToGuid: ports.QuaternionGetter
         output port getQCBIToCBF: ports.QuaternionGetter
+        
+        @ Set attitude control mode
 
         ###############################################################################
         # Standard AC Ports: Required for Channels, Events, Commands, and Parameters  #
