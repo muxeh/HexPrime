@@ -32,6 +32,10 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     types::vector3 m_guidErrPos;
     types::vector3 m_guidErrVel;
     types::vector3 m_velDirAtDsouzaEntry;
+    types::vector3 m_guidAccelCmdDirCBI;
+    types::vector3 m_guidAccelCmdMag;
+    types::vector3 m_posGuid;
+    types::vector3 m_velGuid;
 
     // ----------------------------------------------------------------------
     // Handler implementations for typed input ports
@@ -41,14 +45,18 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     void start_handler(FwIndexType portNum  //!< The port number
                        ) override;
 
-    //! Handler implementation for stop
-    void stop_handler(FwIndexType portNum  //!< The port number
-                      ) override;
-
     //! Handler implementation for tick
     void tick_handler(FwIndexType portNum,  //!< The port number
                       U32 context           //!< The call order
                       ) override;
+
+    //! Handler implementation for stop
+    void stop_handler(FwIndexType portNum  //!< The port number
+                      ) override;
+
+    //! Handler implementation for returnBodyAlignVec
+    components::types::vector3 returnBodyAlignVec_handler(FwIndexType portNum  //!< The port number
+                                                          ) override;
 
     //! Handler implementation for returnBodyConstrainVec
     components::types::vector3 returnBodyConstrainVec_handler(FwIndexType portNum  //!< The port number
@@ -57,6 +65,10 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     //! Handler implementation for returnInertConstrainVec
     components::types::vector3 returnInertConstrainVec_handler(FwIndexType portNum  //!< The port number
                                                                ) override;
+
+    //! Handler implementation for returnInertialAlignVec
+    components::types::vector3 returnInertAlignVec_handler(FwIndexType portNum  //!< The port number
+                                                              ) override;
 
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
@@ -157,7 +169,7 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
                                vec1[2] - vec2[2]});
     }
 
-    types::vector3 vec3_scale(const types::vector3 &vec, const F64 &scalar) {
+    types::vector3 vec3_scale(const F64 &scalar, const types::vector3 &vec) {
         return types::vector3({scalar * vec[0],
                                scalar * vec[1],
                                scalar * vec[2]});
@@ -174,7 +186,7 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
         }
         // Return normalized vector
         // Scale by inverse norm
-        return vec3_scale(vec, 1 / vec3_norm(vec));
+        return vec3_scale(1 / vec3_norm(vec), vec);
     }
 
     void vec3_normalize(types::vector3 &vec) {
@@ -184,6 +196,16 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     types::vector3 quat_leftTransform(const types::quaternion &quat, const types::vector3 &vec) {
         return vec;
     }
+
+    types::quaternion quat_conjugate(const types::quaternion &quat) {
+        return types::quaternion(quat.get_scalar(),
+                                 vec3_scale(-1, quat.get_vector()));
+    }
+
+    types::quaternion quat_multiply(const types::quaternion &quat1, const types::quaternion &quat2) {
+        return quat1;
+    }
+
 };
 
 }  // namespace components

@@ -15,7 +15,11 @@ namespace components {
 DescentGuidance ::DescentGuidance(const char* const compName) : DescentGuidanceComponentBase(compName),
                                                                 m_guidErrPos(types::vector3(0)),
                                                                 m_guidErrVel(types::vector3(0)),
-                                                                m_velDirAtDsouzaEntry(types::vector3(0)) {}
+                                                                m_velDirAtDsouzaEntry(types::vector3(0)),
+                                                                m_guidAccelCmdDirCBI(types::vector3(0)),
+                                                                m_guidAccelCmdMag(types::vector3(0)),
+                                                                m_posGuid(types::vector3(0)),
+                                                                m_velGuid(types::vector3(0)) {}
 
 DescentGuidance ::~DescentGuidance() {}
 
@@ -26,11 +30,6 @@ DescentGuidance ::~DescentGuidance() {}
 void DescentGuidance ::start_handler(FwIndexType portNum) {
     // Forward start signal to state machine
     this->stateMachine_sendSignal_start();
-}
-
-void DescentGuidance ::stop_handler(FwIndexType portNum) {
-    // Forward stop signal to state machine
-    this->stateMachine_sendSignal_stop();
 }
 
 void DescentGuidance ::tick_handler(FwIndexType portNum, U32 context) {
@@ -50,6 +49,15 @@ void DescentGuidance ::tick_handler(FwIndexType portNum, U32 context) {
     // ----------------------------------------------------------------------
 }
 
+void DescentGuidance ::stop_handler(FwIndexType portNum) {
+    // Forward stop signal to state machine
+    this->stateMachine_sendSignal_stop();
+}
+
+types::vector3 DescentGuidance ::returnBodyAlignVec_handler(FwIndexType portNum) {
+    return types::vector3(0);
+}
+
 types::vector3 DescentGuidance ::returnBodyConstrainVec_handler(FwIndexType portNum) {
     Fw::ParamValid vld(Fw::ParamValid::INVALID);
     // Return body constrain vector parameter
@@ -66,6 +74,10 @@ types::vector3 DescentGuidance ::returnInertConstrainVec_handler(FwIndexType por
             // Default to north
             return this->getNorthVector_out(0);
     };
+}
+
+types::vector3 DescentGuidance ::returnInertAlignVec_handler(FwIndexType portNum) {
+    return types::vector3(0);
 }
 
 // ----------------------------------------------------------------------
@@ -90,7 +102,7 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_getVelDir(
     SmId smId,
     components_DescentGuidance_StateMachine::Signal signal) {
     // Get velocity direction
-    m_velDirAtDsouzaEntry = vec3_normalized(this->getVelCBF_out(0));
+    m_velDirAtDsouzaEntry = vec3_normalized(m_velGuid);
 }
 
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_igniteMainEngine(
@@ -175,21 +187,24 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_shutdownAl
 // Helper Functions
 // ----------------------------------------------------------------------
 void DescentGuidance::formulateGuidanceError() {
-    // Get spacecraft position and velocity in CBF
-    types::vector3 posCBF = this->getPosCBF_out(0);
-    types::vector3 velCBF = this->getVelCBF_out(0);
+    // Get spacecraft position and velocity in CBI
+    types::vector3 posCBI = this->getPosCBI_out(0);
+    types::vector3 velCBI = this->getVelCBI_out(0);
     // Get landing site position in CBF
     types::vector3 landingSiteCBF = this->getLandingSiteCBF_out(0);
-    // Get Guidance frame
-    types::quaternion q_cbfToGuid = this->getQCBFToGuid_out(0);
-    // Rotate CBF state to Guidance frame
-    types::vector3 posGuid = quat_leftTransform(q_cbfToGuid, posCBF);
-    types::vector3 velGuid = quat_leftTransform(q_cbfToGuid, velCBF);
-    types::vector3 landingSiteGuid = quat_leftTransform(q_cbfToGuid, landingSiteCBF);
+    // Get frame quaternionds
+    types::quaternion q_CBIToCBF = this->getQCBIToCBF_out(0);
+    types::quaternion q_CBIToGuid = this->getQCBIToGuid_out(0);
+    // Rotate states to Guidance frame
+    m_posGuid = quat_leftTransform(q_CBIToGuid, posCBI);
+    m_velGuid = quat_leftTransform(q_CBIToGuid, velCBI);
+    types::vector3 landingSiteGuid = quat_leftTransform(quat_multiply(q_CBIToGuid, quat_conjugate(q_CBIToCBF)), landingSiteCBF);
     // Compute guidance error
-    m_guidErrPos = vec3_sub(landingSiteGuid, posGuid);
-    m_guidErrPos = vec3_sub(types::vector3(0), velGuid);
+    m_guidErrPos = vec3_sub(landingSiteGuid, m_posGuid);
+    m_guidErrPos = vec3_sub(types::vector3(0), m_velGuid);
     // Write telemetry
+    this->tlmWrite_pos_guid(m_posGuid);
+    this->tlmWrite_pos_guid(m_velGuid);
     this->tlmWrite_guid_err_pos(m_guidErrPos);
     this->tlmWrite_guid_err_vel(m_guidErrVel);
 }

@@ -35,6 +35,8 @@ module components {
         sync input port start: ports.Invocator
         sync input port tick: Svc.Sched
         sync input port stop: ports.Invocator
+        sync input port returnBodyAlignVec: ports.Vector3Getter
+        sync input port returnInertAlignVec: ports.Vector3Getter
         sync input port returnBodyConstrainVec: ports.Vector3Getter
         sync input port returnInertConstrainVec: ports.Vector3Getter
 
@@ -45,12 +47,13 @@ module components {
         output port getAGL: ports.F64Getter
 
         @ Get position and velocity in Guidance Frame
-        output port getPosCBF: ports.Vector3Getter
-        output port getVelCBF: ports.Vector3Getter
+        output port getPosCBI: ports.Vector3Getter
+        output port getVelCBI: ports.Vector3Getter
         output port getLandingSiteCBF: ports.Vector3Getter
 
-        @ Get CBF to Guidance frame quaternion
-        output port getQCBFToGuid: ports.QuaternionGetter
+        @ Get Guidance frame quaternions
+        output port getQCBIToGuid: ports.QuaternionGetter
+        output port getQCBIToCBF: ports.QuaternionGetter
 
         ###############################################################################
         # Standard AC Ports: Required for Channels, Events, Commands, and Parameters  #

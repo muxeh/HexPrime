@@ -1,3 +1,9 @@
+@ Position in guidance frame
+telemetry pos_guid: types.vector3
+
+@ Velocity in guidance frame
+telemetry vel_guid: types.vector3
+
 @ Guidance error in position
 telemetry guid_err_pos: types.vector3
 
