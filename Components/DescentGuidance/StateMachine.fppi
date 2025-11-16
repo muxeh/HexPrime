@@ -20,6 +20,7 @@ state machine StateMachine {
     # Actions
     action trackingGuidance    
     action setDsouzaControllers
+    action getVelDir
     action igniteMainEngine
     action dsouzaGuidance
     action shutdownMainEngine
@@ -47,7 +48,7 @@ state machine StateMachine {
 
     state DSOUZA {
 
-        entry do {setDsouzaControllers, igniteMainEngine}
+        entry do {setDsouzaControllers, getVelDir, igniteMainEngine}
 
         on tick do {dsouzaGuidance}
         

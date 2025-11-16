@@ -8,6 +8,7 @@
 #define components_DescentGuidance_HPP
 
 #include "Components/DescentGuidance/DescentGuidanceComponentAc.hpp"
+#include <cmath>
 
 namespace components {
 
@@ -26,6 +27,13 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
 
   private:
     // ----------------------------------------------------------------------
+    // Member variables
+    // ----------------------------------------------------------------------
+    types::vector3 m_guidErrPos;
+    types::vector3 m_guidErrVel;
+    types::vector3 m_velDirAtDsouzaEntry;
+
+    // ----------------------------------------------------------------------
     // Handler implementations for typed input ports
     // ----------------------------------------------------------------------
 
@@ -42,6 +50,14 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
                       U32 context           //!< The call order
                       ) override;
 
+    //! Handler implementation for returnBodyConstrainVec
+    components::types::vector3 returnBodyConstrainVec_handler(FwIndexType portNum  //!< The port number
+                                                              ) override;
+
+    //! Handler implementation for returnInertConstrainVec
+    components::types::vector3 returnInertConstrainVec_handler(FwIndexType portNum  //!< The port number
+                                                               ) override;
+
     // ----------------------------------------------------------------------
     // Implementations for internal state machine actions
     // ----------------------------------------------------------------------
@@ -54,6 +70,12 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
 
     //! Implementation for action setDsouzaControllers of state machine components_DescentGuidance_StateMachine
     void components_DescentGuidance_StateMachine_action_setDsouzaControllers(
+        SmId smId,                                              //!< The state machine id
+        components_DescentGuidance_StateMachine::Signal signal  //!< The signal
+        ) override;
+
+    //! Implementation for action getVelDir of state machine components_DescentGuidance_StateMachine
+    void components_DescentGuidance_StateMachine_action_getVelDir(
         SmId smId,                                              //!< The state machine id
         components_DescentGuidance_StateMachine::Signal signal  //!< The signal
         ) override;
@@ -121,6 +143,47 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     // ----------------------------------------------------------------------
     // Helper Functions
     // ----------------------------------------------------------------------
+    void formulateGuidanceError();
+
+    types::vector3 vec3_add(types::vector3 vec1, types::vector3 vec2) {
+        return types::vector3({vec1[0] + vec2[0],
+                               vec1[1] + vec2[1],
+                               vec1[2] + vec2[2]});
+    }
+
+    types::vector3 vec3_sub(types::vector3 vec1, types::vector3 vec2) {
+        return types::vector3({vec1[0] - vec2[0],
+                               vec1[1] - vec2[1],
+                               vec1[2] - vec2[2]});
+    }
+
+    types::vector3 vec3_scale(const types::vector3 &vec, const F64 &scalar) {
+        return types::vector3({scalar * vec[0],
+                               scalar * vec[1],
+                               scalar * vec[2]});
+    }
+
+    F64 vec3_norm(const types::vector3 &vec) {
+        return sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+    }
+
+    types::vector3 vec3_normalized(const types::vector3 &vec) {
+        // Check for divide by zero
+        if (vec3_norm(vec) < 1e-9) {
+            return vec;
+        }
+        // Return normalized vector
+        // Scale by inverse norm
+        return vec3_scale(vec, 1 / vec3_norm(vec));
+    }
+
+    void vec3_normalize(types::vector3 &vec) {
+        vec = vec3_normalized(vec);
+    }
+
+    types::vector3 quat_leftTransform(const types::quaternion &quat, const types::vector3 &vec) {
+        return vec;
+    }
 };
 
 }  // namespace components
