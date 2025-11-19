@@ -19,4 +19,6 @@ telemetry BODY_CONSTRAIN_VEC: types.vector3
 telemetry CONSTRAIN_VEC_OPTION: types.vector3
 telemetry DSOUZA_TARGET_BIAS: types.vector3
 telemetry HORIZ_VEL_THRESH: F64
+telemetry TERM_DESC_CTRL: DescentController
+telemetry LAND_DESC_CTRL: DescentController
 telemetry LANDING_AGL: F64

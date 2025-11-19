@@ -22,7 +22,8 @@ DescentGuidance ::DescentGuidance(const char* const compName) : DescentGuidanceC
                                                                 m_dsouzaACMode(types::ACMode::NOT_SET),
                                                                 m_terminalACMode(types::ACMode::NOT_SET),
                                                                 m_landingACMode(types::ACMode::NOT_SET),
-                                                                m_horizVelMag(0) {}
+                                                                m_horizVelMag(0),
+                                                                m_descCtrl({}) {}
 
 DescentGuidance ::~DescentGuidance() {}
 
@@ -37,6 +38,10 @@ void DescentGuidance::configure(types::ACMode dsouzaACMode,
     m_dsouzaACMode = dsouzaACMode;
     m_terminalACMode = terminalACMode;
     m_landingACMode = landingACMode;
+    // Assert all modes are set
+    FW_ASSERT(m_dsouzaACMode != types::ACMode::NOT_SET);
+    FW_ASSERT(m_terminalACMode != types::ACMode::NOT_SET);
+    FW_ASSERT(m_landingACMode != types::ACMode::NOT_SET);
 }
 
 // ----------------------------------------------------------------------
@@ -178,6 +183,9 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_setTermina
     components_DescentGuidance_StateMachine::Signal signal) {
     // Set attitude control mode for Terminal
     this->setACMode_out(m_terminalACMode);
+    // Use Terminal descent controller
+    Fw::ParamValid vld(Fw::ParamValid::INVALID);
+    m_descCtrl = this->paramGet_TERM_DESC_CTRL(vld);
 }
 
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_buildDescentProfileTable(
@@ -197,6 +205,9 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_setLanding
     components_DescentGuidance_StateMachine::Signal signal) {
     // Set attitude control mode for Terminal
     this->setACMode_out(m_terminalACMode);
+    // Use Landing descent controller
+    Fw::ParamValid vld(Fw::ParamValid::INVALID);
+    m_descCtrl = this->paramGet_LAND_DESC_CTRL(vld);
 }
 
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_ignoreRangeFinder(
@@ -221,13 +232,11 @@ void DescentGuidance::formulateGuidanceError() {
     // Get landing site position in CBF
     types::vector3 landingSiteCBF = this->getLandingSiteCBF_out(0);
     // Get frame quaternionds
-    types::quaternion q_CBIToCBF = this->getQCBIToCBF_out(0);
-    types::quaternion q_CBIToGuid = this->getQCBIToGuid_out(0);
-    types::quaternion q_CBFToCBI = quat_conjugate(q_CBIToCBF);
-    types::quaternion q_CBFToGuid = quat_multiply(q_CBIToGuid, q_CBFToCBI);
+    types::quaternion q_CBFToCBI = quat_conjugate(this->getQCBIToCBF_out(0));
+    types::quaternion q_CBFToGuid = quat_multiply(this->getQCBIToGuid_out(0), q_CBFToCBI);
     // Rotate states to Guidance frame
-    m_posGuid = quat_leftTransform(q_CBIToGuid, posCBI);
-    m_velGuid = quat_leftTransform(q_CBIToGuid, velCBI);
+    m_posGuid = quat_leftTransform(this->getQCBIToGuid_out(0), posCBI);
+    m_velGuid = quat_leftTransform(this->getQCBIToGuid_out(0), velCBI);
     types::vector3 landingSiteGuid = quat_leftTransform(q_CBFToGuid, landingSiteCBF);
     // Compute guidance error
     m_guidErrPos = vec3_sub(landingSiteGuid, m_posGuid);

@@ -43,6 +43,7 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     types::ACMode m_dsouzaACMode;
     types::ACMode m_terminalACMode;
     types::ACMode m_landingACMode;
+    DescentController m_descCtrl;
     F64 m_horizVelMag;
 
     // ----------------------------------------------------------------------

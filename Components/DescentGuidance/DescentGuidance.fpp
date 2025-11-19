@@ -22,6 +22,12 @@ module components {
         port ACModeSetter() -> types.ACMode
     }
 
+    struct DescentController {
+        Kp: F64,
+        Ki: F64,
+        Kd: F64
+    }
+
     enum ConstrainVecOption {
         NORTH = 0,
     }

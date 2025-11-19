@@ -13,5 +13,11 @@ param DSOUZA_TARGET_BIAS: types.vector3 default [0, 0, 0]
 @ Horizontal velocity threshold to transition to Terminal Guidance
 param HORIZ_VEL_THRESH: F64 default 20
 
+@ Terminal descent controller
+param TERM_DESC_CTRL: DescentController
+
+@ Landing descent controller
+param LAND_DESC_CTRL: DescentController
+
 @ AGL to transition to Landing Guidance
 param LANDING_AGL: F64 default 10
