@@ -43,7 +43,6 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
     types::ACMode m_dsouzaACMode;
     types::ACMode m_terminalACMode;
     types::ACMode m_landingACMode;
-    DescentController m_descCtrl;
     F64 m_horizVelMag;
 
     // ----------------------------------------------------------------------
@@ -137,20 +136,8 @@ class DescentGuidance final : public DescentGuidanceComponentBase {
         components_DescentGuidance_StateMachine::Signal signal  //!< The signal
         ) override;
 
-    //! Implementation for action ignoreVNS of state machine components_DescentGuidance_StateMachine
-    void components_DescentGuidance_StateMachine_action_ignoreVNS(
-        SmId smId,                                              //!< The state machine id
-        components_DescentGuidance_StateMachine::Signal signal  //!< The signal
-        ) override;
-
     //! Implementation for action setLandingControllers of state machine components_DescentGuidance_StateMachine
     void components_DescentGuidance_StateMachine_action_setLandingControllers(
-        SmId smId,                                              //!< The state machine id
-        components_DescentGuidance_StateMachine::Signal signal  //!< The signal
-        ) override;
-
-    //! Implementation for action ignoreRangeFinder of state machine components_DescentGuidance_StateMachine
-    void components_DescentGuidance_StateMachine_action_ignoreRangeFinder(
         SmId smId,                                              //!< The state machine id
         components_DescentGuidance_StateMachine::Signal signal  //!< The signal
         ) override;

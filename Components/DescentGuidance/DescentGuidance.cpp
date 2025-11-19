@@ -194,12 +194,6 @@ void DescentGuidance ::components_DescentGuidance_StateMachine_action_buildDesce
     // TODO
 }
 
-void DescentGuidance ::components_DescentGuidance_StateMachine_action_ignoreVNS(
-    SmId smId,
-    components_DescentGuidance_StateMachine::Signal signal) {
-    // TODO
-}
-
 void DescentGuidance ::components_DescentGuidance_StateMachine_action_setLandingControllers(
     SmId smId,
     components_DescentGuidance_StateMachine::Signal signal) {
@@ -242,6 +236,7 @@ void DescentGuidance::formulateGuidanceError() {
     m_guidErrPos = vec3_sub(landingSiteGuid, m_posGuid);
     m_guidErrPos = vec3_sub(types::vector3(0), m_velGuid);
     // Compute square of horizontal velocity
+    // Assumes Guidance Z axis is DOWN
     m_horizVelMag = sqrt(m_velGuid[0]*m_velGuid[0] + m_velGuid[1]*m_velGuid[1]);
     // Write telemetry
     this->tlmWrite_pos_guid(m_posGuid);
@@ -250,10 +245,5 @@ void DescentGuidance::formulateGuidanceError() {
     this->tlmWrite_guid_err_vel(m_guidErrVel);
     this->tlmWrite_horiz_vel_mag(m_horizVelMag);
 }
-
-
-// ----------------------------------------------------------------------
-// Vector Math
-// ----------------------------------------------------------------------
 
 }  // namespace components

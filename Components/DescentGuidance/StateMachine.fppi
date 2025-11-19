@@ -7,7 +7,6 @@ state machine StateMachine {
     signal atInTrackPDI
     signal horizVelAchieved
     signal velDirChangeThreshExceeded
-    signal minVNSAGLReached
     signal atLandingAGL
     signal groundContact
     signal contingencyShutdown
@@ -27,9 +26,7 @@ state machine StateMachine {
     action terminalAndLandingGuidance
     action setTerminalControllers
     action buildDescentProfileTable
-    action ignoreVNS
     action setLandingControllers
-    action ignoreRangeFinder
     action shutdownAllEngines
 
     state IDLE {
@@ -48,7 +45,7 @@ state machine StateMachine {
 
     state DSOUZA {
 
-        entry do {setDsouzaControllers, getVelDir, igniteMainEngine}
+        entry do {setDsouzaControllers, getVelDir, igniteMainEngine, dsouzaGuidance}
 
         on tick do {dsouzaGuidance}
         
@@ -60,19 +57,17 @@ state machine StateMachine {
     
     state TERMINAL {
 
-        entry do {shutdownMainEngine, setTerminalControllers, buildDescentProfileTable}
+        entry do {shutdownMainEngine, setTerminalControllers, buildDescentProfileTable, terminalAndLandingGuidance}
 
         on tick do {terminalAndLandingGuidance}
 
-        on minVNSAGLReached do {ignoreVNS}
-        
         on atLandingAGL enter LANDING
 
     }
     
     state LANDING {
 
-        entry do {setLandingControllers, ignoreVNS, ignoreRangeFinder}
+        entry do {setLandingControllers, terminalAndLandingGuidance}
 
         on tick do {terminalAndLandingGuidance}
 
